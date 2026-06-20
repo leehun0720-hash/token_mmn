@@ -1,16 +1,121 @@
-# React + Vite
+# 🚀 통합 AI 토큰 매니저 (Integrated AI Token Manager)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+통합 AI 토큰 매니저 대시보드 프로젝트에 오신 것을 환영합니다! 본 애플리케이션은 OpenAI(GPT), Google Gemini, Anthropic Claude 등 다양한 AI 모델과 커스텀 에이전트의 **사용 요금(단가), 토큰 한도(Quota), 실시간 API 호출 데이터**를 한 곳에서 효율적으로 관제하고 제어할 수 있는 스마트 관측 대시보드입니다.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 📖 목차
+1. [핵심 기능 안내](#-핵심-기능-안내)
+2. [각 메뉴별 상세 사용 가이드](#-각-메뉴별-상세-사용-가이드)
+3. [🔑 API Key 발급 및 연동 방법](#-api-key-발급-및-연동-방법)
+4. [🛠️ 신규 서비스 등록 및 설정 변경 방법](#-신규-서비스-등록-및-설정-변경-방법)
+5. [📈 사용량 변동 및 한도 초과(Quota Alert) 작동 방식](#-사용량-변동-및-한도-초과quota-alert-작동-방식)
+6. [💻 로컬 실행 및 설치 방법](#-로컬-실행-및-설치-방법)
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## ✨ 핵심 기능 안내
 
-## Expanding the ESLint configuration
+* **실시간 AI Quota 모니터링**: 7종의 기본 모델 및 사용자가 직접 등록한 커스텀 서비스들의 사용량과 한도를 원형 프로그레스 바 및 임계치별 컬러(Green/Orange/Red)로 직관적으로 추적합니다.
+* **실시간 API Playground**: OpenAI(GPT) 및 Google Gemini API Key를 연동하여 가상이 아닌 **실제 AI 통신**을 수행하고 결과 및 소비된 토큰 정보를 실시간으로 수집합니다.
+* **외부 로그 정규식 주입기**: 외부 터미널, 서버 로그, 에이전트 결과 텍스트를 복사-붙여넣기하여 정규식 엔진이 자동으로 모델명 및 입력/출력 토큰을 파싱하고 대시보드 수치에 즉각 더해줍니다.
+* **정합성 유지 역산출 (Rollback)**: 개별 API 이력 로그를 제거하면 대시보드 상단 통계 카드(비용, 총 토큰, 세션 수)와 일자별 차트 수치에서 즉각 역산(차감) 처리되어 완벽한 정합성을 제공합니다.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 🖥️ 각 메뉴별 상세 사용 가이드
+
+본 앱은 상단 헤더 바로 아래의 탭 네비게이션을 통해 3가지 주요 기능을 제공합니다.
+
+### 1. 📊 관제 대시보드 (Dashboard)
+등록된 전체 AI 서비스들의 현황을 시각화하여 확인하는 핵심 화면입니다.
+* **상단 통계 카드**: 등록된 모든 서비스의 이번 달 누적 요금(USD), 누적 토큰합, 실시간 활동 에이전트/서비스 개수를 한눈에 요약 제공합니다.
+* **모델별 누적 사용 비율 (Stacked Bar)**: 일자별로 누적된 토큰 사용 비율을 누적 막대그래프로 보여줍니다. 특정 일자에 어떤 모델이 토큰을 가장 많이 소모했는지 비교하기에 용이합니다.
+* **일자별 토큰 사용량 트렌드 (Line Chart)**: 전체 기간 동안의 사용량 추이를 실시간 꺾은선그래프로 그려줍니다.
+* **서비스 통합 콘솔 (Limits & Pricing Control)**: 
+  - 각 카드 우측 상단의 **[관리]** 버튼을 통해 서비스별 **1K 토큰당 입력/출력 단가** 및 **최대 허용 한도량**을 수동으로 즉시 조절할 수 있습니다.
+  - 한도 대비 사용량이 80% 미만이면 **초록색**, 80%~100% 사이면 **주황색**, 100%를 초과하면 **붉은색 경고** 게이지가 표기됩니다.
+* **상세 호출 이력 로그**: 하단 테이블에 개별 API 호출 일자, 모델명, 작업 유형, 소모된 입/출력 토큰이 기록됩니다. 쓰레기통 버튼을 눌러 개별 이력을 삭제하면 모든 지표와 차트에서 해당 값이 안전하게 역산됩니다.
+
+### 2. 💻 라이브 API 테스터 (Playground)
+모의 테스트가 아닌 실제 OpenAI나 Gemini 서버로 요청을 전송하여 통신 상태와 토큰 소모량을 체크하는 공간입니다.
+1. 우측 상단의 **[API Key 설정]** 버튼을 클릭하여 소지하고 계신 API 키를 입력 및 저장합니다. (입력하신 키는 사용자의 웹 브라우저 내 로컬 스토리지에만 안전하게 저장되며, 외부 서버로 전송되지 않습니다.)
+2. 테스터 화면의 **서비스 모델** 드롭다운 메뉴에서 연동할 실시간 모델(예: OpenAI `gpt-4o` 또는 Gemini `1.5 Flash` 등)을 선택합니다.
+3. 프롬프트 창에 질의할 문장(예: "파이썬으로 퀵 정렬을 구현해 줘")을 입력한 뒤 **[실제 API 호출 전송]** 버튼을 클릭합니다.
+4. 요청 성공 시 실제 AI 모델의 응답 내용이 출력되며, 통신 시 실제 소모된 **입력 토큰 수, 출력 토큰 수, 소모 비용($)**이 하단 카드에 계산되어 표기됨과 동시에 관제 대시보드의 당일 차트 및 통계 데이터에 **실시간 자동 누적**됩니다.
+
+### 3. 📥 외부 에이전트 로그 주입기 (Ingress)
+외부 파이썬 스크립트, LangChain 로그, 터미널 출력 결과 텍스트 등을 복사하여 대시보드에 즉시 입력시키는 도구입니다.
+1. 텍스트 영역에 외부 에이전트 실행 로그(예: `"Input tokens: 1,500, Output tokens: 350. Model used: gpt-4o"`)를 자유롭게 복사하여 붙여넣습니다.
+2. **[정규식 로그 파싱 실행]** 버튼을 클릭합니다.
+3. 시스템 내부의 파서 엔진이 정규식을 적용하여 해당 로그 내부에서 **모델명, 입력 토큰 수, 출력 토큰 수**를 정밀 추출하여 하단 결과창에 제안합니다.
+4. 검출된 요약 결과가 올바른지 확인한 후, **[대시보드에 로그 주입 확정]** 버튼을 누르면 대시보드 로그 리스트 및 일일 사용량 차트에 즉각 누적 연동됩니다.
+
+---
+
+## 🔑 API Key 발급 및 연동 방법
+
+본 애플리케이션의 라이브 API 테스터를 이용하기 위해서는 각 제공업체의 API 키가 필요합니다. 다음 경로에서 발급받으실 수 있습니다.
+
+### 1. Google Gemini API Key 발급 방법
+1. **Google AI Studio**([https://aistudio.google.com/](https://aistudio.google.com/))에 구글 계정으로 로그인합니다.
+2. 좌측 상단의 **`Get API Key`** 버튼을 클릭합니다.
+3. **`Create API Key`** 버튼을 눌러 새 API 키를 생성합니다.
+4. 생성된 키(예: `AIzaSy...`)를 복사한 뒤, 대시보드 우측 상단 **[API Key 설정]** 모달의 **Gemini API Key** 입력란에 붙여넣고 저장합니다.
+
+### 2. OpenAI (GPT) API Key 발급 방법
+1. **OpenAI API Platform**([https://platform.openai.com/api-keys](https://platform.openai.com/api-keys))에 로그인합니다.
+2. **`Create new secret key`** 버튼을 클릭합니다.
+3. 키의 이름을 지정하고 **`Create secret key`**를 실행합니다.
+4. 생성된 키(예: `sk-...`)를 복사한 뒤, 대시보드 우측 상단 **[API Key 설정]** 모달의 **OpenAI API Key** 입력란에 붙여넣고 저장합니다.
+
+> [!WARNING]
+> * API Key는 브라우저의 `localStorage` 공간에 보관되어 페이지를 새로고침해도 유지됩니다. 
+> * 공용 PC 등 보안이 취약한 곳에서 사용하신 후에는 반드시 **[초기화]** 버튼을 눌러 모든 API Key와 개인 데이터를 소거해 주시기 바랍니다.
+
+---
+
+## 🛠️ 신규 서비스 등록 및 설정 변경 방법
+
+### 1. 신규 서비스 동적 등록
+1. 우측 상단 **[+ 새 서비스 등록]** 버튼을 클릭합니다.
+2. **서비스 모델 템플릿** 드롭다운에서 등록하고자 하는 베이스 모델을 선택합니다.
+   * `Custom`을 선택하는 경우, 이름부터 요율까지 모두 커스텀 입력이 가능합니다.
+   * 템플릿 모델(예: `Claude 3.5 Sonnet`, `Gemini 1.5 Pro` 등)을 고르면 해당 모델의 공식 입출력 단가 및 권장 임계 한도가 양식에 자동으로 미리 채워집니다.
+3. 서비스의 인지도를 높여줄 **테마 컬러**를 선택하고 **[서비스 등록 완료]**를 누르면 즉각 대시보드에 신설됩니다.
+
+### 2. 설정 변경 (단가 및 한도 변경)
+* 대시보드 하단의 **서비스 통합 콘솔** 목록에서 원하는 모델의 **[관리]** 버튼을 누릅니다.
+* 활성화된 에디터 폼에 원하는 1K당 요율(USD) 및 새로운 Quota 사용량 제한값을 적은 후 **[수정 완료]**를 클릭하면 변경 사항이 실시간으로 계산에 대입됩니다.
+
+---
+
+## 📈 사용량 변동 및 한도 초과(Quota Alert) 작동 방식
+
+* **사용량 누적**: 라이브 테스터 성공, 로그 주입기 완료, 혹은 가상 시뮬레이션 실행 시 토큰 사용량이 증가함에 따라 대시보드의 차트와 프로그레스 게이지가 실시간으로 우상향합니다.
+* **80% 경고 알림**: 한 모델의 누적 소모량이 지정 한도의 **80%**에 도달하면 게이지 색상이 주황색으로 바뀜과 동시에 화면 상단에 해당 모델의 잔여 용량 경고 배너가 실시간 팝업됩니다.
+* **100% 초과 차단**: 사용량이 한도의 **100%**를 넘어서면 게이지가 붉은색으로 바뀌며, 라이브 Playground 및 시뮬레이터에서 해당 서비스로 호출 시 **`[Quota Limit Exceeded] 사용 한도를 초과하여 호출이 차단되었습니다.`**라는 경고 모달과 함께 실행이 완전 차단됩니다.
+  - 차단을 해제하기 위해서는 서비스 통합 콘솔의 **[관리]** 탭에서 해당 모델의 **제한 한도를 증액**해 주어야 합니다.
+
+---
+
+## 💻 로컬 실행 및 설치 방법
+
+프로젝트를 로컬 환경에 설치하여 실행하고 빌드하는 명령어입니다.
+
+### 1. 패키지 의존성 설치
+```bash
+npm install
+```
+
+### 2. 로컬 개발 서버 기동 (HMR 지원)
+```bash
+npm run dev
+```
+* 서버 실행 후 브라우저에서 [http://localhost:5173/](http://localhost:5173/)로 자동 기동됩니다.
+
+### 3. 정적 리소스 프로덕션 빌드
+```bash
+npm run build
+```
+* 빌드가 완료되면 최적화된 결과물이 `dist/` 폴더 내에 생성됩니다.

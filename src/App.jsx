@@ -129,6 +129,7 @@ export default function TokenManagerApp() {
   const [showKeyModal, setShowKeyModal] = useState(false); // API 키 설정창
   const [editingModel, setEditingModel] = useState(null);
   const [quotaAlert, setQuotaAlert] = useState(null);
+  const [guideTab, setGuideTab] = useState('menu'); // 'menu' | 'apikey' | 'quota'
 
   // 로컬스토리지 동기화 이펙트
   useEffect(() => {
@@ -666,55 +667,105 @@ export default function TokenManagerApp() {
             >
               <X className="h-5 w-5" />
             </button>
-            <div className="flex items-center gap-3 text-indigo-400 mb-6">
+            <div className="flex items-center gap-3 text-indigo-400 mb-4">
               <BookOpen className="h-7 w-7 stroke-[2]" />
               <h3 className="text-xl font-bold font-outfit text-white">사용법 및 자원 관리 매뉴얼</h3>
             </div>
-            
-            <div className="space-y-6 text-sm text-slate-300 leading-relaxed">
-              <section className="space-y-2">
-                <h4 className="text-indigo-400 font-bold flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                  1. 내 AI 서비스 / 에이전트 신규 등록
-                </h4>
-                <p className="pl-3 text-slate-400 text-xs">
-                  상단 헤더의 <b>[+ 새 서비스 등록]</b> 버튼을 통해 신규 서비스를 신설합니다. 이름, 입/출력 토큰당 단가 요율, 최초 Quota 제한량 및 색상을 선택하면 대시보드 시스템에 등록됩니다. **서비스 템플릿 드롭다운**을 선택하면 기본 베이스 모델의 입출력 요율 정보 및 최대 컨텍스트 윈도우 스펙이 자동으로 노출됩니다.
-                </p>
-              </section>
 
-              <section className="space-y-2">
-                <h4 className="text-indigo-400 font-bold flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                  2. 요율 및 한도(Quota) 직접 제어
-                </h4>
-                <p className="pl-3 text-slate-400 text-xs">
-                  우측 하단 <b>'서비스 통합 콘솔'</b>에서 각 서비스 옆의 **[관리]** 버튼을 눌러 제한 한도량(토큰 수)과 1K당 입출력 요금을 수동 수정할 수 있습니다.
-                </p>
-                <ul className="pl-6 list-disc text-slate-400 text-xs space-y-1">
-                  <li><b>게이지바 임계치</b>: 사용량이 한도의 80% 미만이면 <span className="text-emerald-400 font-semibold">녹색</span>, 80%~100%는 <span className="text-amber-400 font-semibold">주황색</span>, 100% 초과는 <span className="text-rose-400 font-semibold">적색</span>으로 표기됩니다.</li>
-                  <li><b>호출 차단</b>: 100% 한도를 넘긴 모델로 API 테스트 호출 시 경고 모달과 함께 신규 동작이 완전 차단됩니다.</li>
-                </ul>
-              </section>
+            {/* 내부 탭 메뉴 */}
+            <div className="flex border-b border-slate-800/80 mb-5 gap-1.5 text-xs">
+              <button 
+                onClick={() => setGuideTab('menu')}
+                className={`px-3.5 py-2.5 font-semibold transition-all border-b-2 cursor-pointer ${guideTab === 'menu' ? 'border-indigo-500 text-white' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
+              >
+                🖥️ 메뉴별 가이드
+              </button>
+              <button 
+                onClick={() => setGuideTab('apikey')}
+                className={`px-3.5 py-2.5 font-semibold transition-all border-b-2 cursor-pointer ${guideTab === 'apikey' ? 'border-indigo-500 text-white' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
+              >
+                🔑 API 키 발급/연동
+              </button>
+              <button 
+                onClick={() => setGuideTab('quota')}
+                className={`px-3.5 py-2.5 font-semibold transition-all border-b-2 cursor-pointer ${guideTab === 'quota' ? 'border-indigo-500 text-white' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
+              >
+                📊 등록 & 한도(Quota) 규칙
+              </button>
+            </div>
 
-              <section className="space-y-2">
-                <h4 className="text-indigo-400 font-bold flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                  3. 가상 API 테스트 시뮬레이션
-                </h4>
-                <p className="pl-3 text-slate-400 text-xs">
-                  사용자가 직접 추가한 커스텀 모델을 포함해, 드롭다운에서 서비스를 선택하고 프롬프트 크기를 기입해 호출을 전송할 수 있습니다. 호출 시 실시간으로 게이지가 상승하고 대시보드 그래프가 변동합니다.
-                </p>
-              </section>
+            {/* 탭 내용 분기 */}
+            <div className="space-y-4 text-xs text-slate-300 leading-relaxed max-h-[50vh] overflow-y-auto pr-1">
+              {guideTab === 'menu' && (
+                <div className="space-y-4">
+                  <section className="space-y-1.5">
+                    <h4 className="text-indigo-400 font-bold text-sm">📊 관제 대시보드 (Dashboard)</h4>
+                    <p className="text-slate-400">
+                      등록된 모든 모델의 누적 사용량, 요금 추이, 사용 비율을 시각적으로 모니터링합니다. 하단의 <b>호출 이력 로그</b> 테이블 우측의 삭제(휴지통) 버튼을 클릭하여 로그를 제거하면, 해당 데이터가 대시보드 차트 및 모든 통계 카드에서 <b>실시간 자동 역산(감산) 처리</b>되어 정확한 자원 흐름을 보장합니다.
+                    </p>
+                  </section>
+                  <section className="space-y-1.5">
+                    <h4 className="text-indigo-400 font-bold text-sm">💻 라이브 API 테스터 (Playground)</h4>
+                    <p className="text-slate-400">
+                      가상이 아닌 실제 Google Gemini 및 OpenAI API와 실시간으로 통신합니다. 헤더의 <b>[API Key 설정]</b>에 키를 등록한 뒤 원하는 모델과 프롬프트를 지정하여 호출하면, 발생한 실제 토큰 수와 비용이 대시보드 사용량에 즉시 가산됩니다.
+                    </p>
+                  </section>
+                  <section className="space-y-1.5">
+                    <h4 className="text-indigo-400 font-bold text-sm">📥 외부 에이전트 로그 주입기 (Ingress)</h4>
+                    <p className="text-slate-400">
+                      외부 서버나 CLI에서 수행한 터미널 출력 결과 텍스트를 입력창에 넣고 파싱 버튼을 클릭하면, 내부 정규식 엔진이 자동으로 모델명 및 소모 토큰을 감지하여 대시보드에 즉시 주입해 줍니다.
+                    </p>
+                  </section>
+                </div>
+              )}
 
-              <section className="space-y-2">
-                <h4 className="text-indigo-400 font-bold flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                  4. 개별 로그 삭제와 역산출 (Rollback)
-                </h4>
-                <p className="pl-3 text-slate-400 text-xs">
-                  테이블 우측의 <Trash2 className="inline h-3.5 w-3.5 text-slate-500" /> 버튼으로 개별 API 로그를 삭제하면, 해당 로그의 비용 및 토큰 사용량이 대시보드의 **모든 통계 카드와 일일 차트 점수에서 즉각 빼기(역산) 처리**되어 데이터 정합성을 제공합니다.
-                </p>
-              </section>
+              {guideTab === 'apikey' && (
+                <div className="space-y-4">
+                  <section className="space-y-2">
+                    <h4 className="text-emerald-400 font-bold text-sm flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
+                      Google Gemini API Key 발급
+                    </h4>
+                    <p className="text-slate-400">
+                      1. <a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer" className="text-indigo-400 underline hover:text-indigo-300">Google AI Studio</a>에 구글 계정으로 접속합니다.<br />
+                      2. 왼쪽 상단의 <b>Get API Key</b> 메뉴를 선택합니다.<br />
+                      3. <b>Create API Key</b> 버튼을 눌러 새 키를 생성 및 복사한 뒤, 본 앱 헤더의 <b>API Key 설정</b> 모달에 입력하십시오.
+                    </p>
+                  </section>
+                  <section className="space-y-2">
+                    <h4 className="text-emerald-400 font-bold text-sm flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
+                      OpenAI (GPT) API Key 발급
+                    </h4>
+                    <p className="text-slate-400">
+                      1. <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-indigo-400 underline hover:text-indigo-300">OpenAI API Platform</a> 사이트에 로그인합니다.<br />
+                      2. <b>Create new secret key</b> 버튼을 클릭하여 새 키를 만듭니다.<br />
+                      3. 발급된 <code>sk-...</code> 형태의 보안 키를 복사하여 헤더의 API Key 설정 입력창에 저장하십시오.
+                    </p>
+                  </section>
+                  <p className="text-[10px] text-slate-500 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
+                    * 주의: 입력하신 API Key는 브라우저의 내부 저장소(localStorage)에만 기록되며, 어떠한 외부 서버로도 전송되지 않고 클라이언트 단에서 직접 통신에 사용되므로 안전합니다.
+                  </p>
+                </div>
+              )}
+
+              {guideTab === 'quota' && (
+                <div className="space-y-4">
+                  <section className="space-y-1.5">
+                    <h4 className="text-amber-400 font-bold text-sm">🆕 신규 서비스 동적 등록</h4>
+                    <p className="text-slate-400">
+                      헤더의 <b>[+ 새 서비스 등록]</b> 버튼을 누르면 팝업이 활성화됩니다. 템플릿 드롭다운(GPT-4o, Claude 3 Opus 등)을 선택하면 모델별 공식 입/출력 단가 및 추천 임계값이 자동 입력되며, <b>Custom</b> 모드로 직접 요율과 색상을 제어하여 새 서비스를 창설할 수도 있습니다.
+                    </p>
+                  </section>
+                  <section className="space-y-1.5">
+                    <h4 className="text-amber-400 font-bold text-sm">🚨 Quota 잔여량 감지 및 자동 차단 시스템</h4>
+                    <p className="text-slate-400">
+                      특정 모델의 실시간 토큰 사용량이 한도 대비 <b>80%</b>에 도달하면 상태 게이지가 주황색으로 바뀜과 동시에 화면 상단에 <b>임계치 경고 바</b>가 팝업되어 관리를 알립니다.<br />
+                      사용량이 <b>100%</b>를 초과하여 한도가 완전히 소진되면 게이지는 붉은색으로 바뀌며, 라이브 테스트 및 호출 동작이 즉시 <b>완전 차단</b>됩니다. 차단을 풀려면 하단 <b>서비스 통합 콘솔</b>의 <b>[관리]</b> 탭에서 한도를 수정(증액)해야 합니다.
+                    </p>
+                  </section>
+                </div>
+              )}
             </div>
 
             <div className="mt-8 pt-4 border-t border-slate-800/80 flex justify-end">
