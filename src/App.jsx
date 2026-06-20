@@ -16,6 +16,31 @@ const GithubIcon = (props) => (
   </svg>
 );
 
+// 차트 커스텀 툴팁 컴포넌트
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-slate-950/95 border border-slate-800/80 p-3.5 rounded-xl shadow-2xl backdrop-blur-md">
+        <p className="text-xs font-bold text-slate-400 mb-2 font-mono">{label}</p>
+        <div className="space-y-1.5">
+          {payload.map((entry, index) => (
+            <div key={index} className="flex items-center justify-between gap-6 text-[11px]">
+              <span className="flex items-center gap-1.5 text-slate-300">
+                <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: entry.color }}></span>
+                {entry.name}
+              </span>
+              <span className="font-bold font-mono text-white">
+                {entry.value.toLocaleString()} 토큰
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
 // 1. 초기 기본 모델 및 단가 설정 (1K 토큰 기준 USD)
 const INITIAL_PRICING = {
   'GPT-4o': { input: 0.005, output: 0.015, color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)', border: 'rgba(16, 185, 129, 0.3)', key: 'gpt4o', isCustom: false },
@@ -129,6 +154,27 @@ export default function TokenManagerApp() {
   useEffect(() => {
     localStorage.setItem('token_manager_openai_key', openaiKey);
   }, [openaiKey]);
+
+  // --- 데이터 초기화 핸들러 ---
+  const handleResetData = () => {
+    if (window.confirm('모든 설정값(API Key, 등록 모델, 로그 내역)을 초기값으로 복구하시겠습니까?')) {
+      localStorage.removeItem('token_manager_pricing');
+      localStorage.removeItem('token_manager_limits');
+      localStorage.removeItem('token_manager_logs');
+      localStorage.removeItem('token_manager_usage_data');
+      localStorage.removeItem('token_manager_gemini_key');
+      localStorage.removeItem('token_manager_openai_key');
+      
+      setPricing(INITIAL_PRICING);
+      setLimits(INITIAL_LIMITS);
+      setLogs(INITIAL_LOGS);
+      setUsageData(INITIAL_USAGE_DATA);
+      setGeminiKey('');
+      setOpenaiKey('');
+      
+      alert('모든 데이터가 기본값으로 초기화되었습니다.');
+    }
+  };
 
   // --- 2. 입력 폼 상태 관리 ---
   const [selectedTemplate, setSelectedTemplate] = useState('Custom');
