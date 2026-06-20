@@ -157,14 +157,16 @@ export default function TokenManagerApp() {
 
   // --- 데이터 초기화 핸들러 ---
   const handleResetData = () => {
-    if (window.confirm('모든 설정값(API Key, 등록 모델, 로그 내역)을 초기값으로 복구하시겠습니까?')) {
-      localStorage.removeItem('token_manager_pricing');
-      localStorage.removeItem('token_manager_limits');
-      localStorage.removeItem('token_manager_logs');
-      localStorage.removeItem('token_manager_usage_data');
-      localStorage.removeItem('token_manager_gemini_key');
-      localStorage.removeItem('token_manager_openai_key');
+    if (window.confirm('모든 설정값(API Key, 등록 모델, 로그 내역)을 초기 기본값으로 복구하시겠습니까?')) {
+      // 로컬스토리지 키를 완전히 초기값으로 직접 덮어씌웁니다. (비동기 꼬임 방지)
+      localStorage.setItem('token_manager_pricing', JSON.stringify(INITIAL_PRICING));
+      localStorage.setItem('token_manager_limits', JSON.stringify(INITIAL_LIMITS));
+      localStorage.setItem('token_manager_logs', JSON.stringify(INITIAL_LOGS));
+      localStorage.setItem('token_manager_usage_data', JSON.stringify(INITIAL_USAGE_DATA));
+      localStorage.setItem('token_manager_gemini_key', '');
+      localStorage.setItem('token_manager_openai_key', '');
       
+      // 상태값 강제 설정
       setPricing(INITIAL_PRICING);
       setLimits(INITIAL_LIMITS);
       setLogs(INITIAL_LOGS);
@@ -172,7 +174,9 @@ export default function TokenManagerApp() {
       setGeminiKey('');
       setOpenaiKey('');
       
-      alert('모든 데이터가 기본값으로 초기화되었습니다.');
+      alert('모든 설정이 초기 기본값으로 복구되었습니다.');
+      // 강제 새로고침하여 리셋된 로컬스토리지를 기반으로 전체 컴포넌트를 청정 마운트합니다.
+      window.location.reload();
     }
   };
 
