@@ -74,22 +74,17 @@ const BASE_MODEL_TEMPLATES = {
   'Llama 3.1 70B': { input: 0.0007, output: 0.0009, limit: 1500000, contextWindow: '128,000 (12.8만)', maxOutput: '4,096' },
 };
 
-// 3. 초기 모의 일자별 차트 데이터
+// 3. 초기 모의 일자별 차트 데이터 (모두 0으로 리셋)
 const INITIAL_USAGE_DATA = [
-  { date: '06-15', gpt4o: 15000, gpt35: 60000, geminiPro: 12000, geminiFlash: 120000, claudeSonnet: 22000, claudeOpus: 5000, llama: 65000 },
-  { date: '06-16', gpt4o: 10000, gpt35: 35000, geminiPro: 6000, geminiFlash: 75000, claudeSonnet: 18000, claudeOpus: 8000, llama: 40000 },
-  { date: '06-17', gpt4o: 25000, gpt35: 80000, geminiPro: 18000, geminiFlash: 150000, claudeSonnet: 35000, claudeOpus: 10000, llama: 80000 },
-  { date: '06-18', gpt4o: 18000, gpt35: 50000, geminiPro: 14000, geminiFlash: 110000, claudeSonnet: 28000, claudeOpus: 4000, llama: 55000 },
-  { date: '06-19', gpt4o: 30000, gpt35: 95000, geminiPro: 25000, geminiFlash: 180000, claudeSonnet: 45000, claudeOpus: 12000, llama: 90000 },
+  { date: '06-15', gpt4o: 0, gpt35: 0, geminiPro: 0, geminiFlash: 0, claudeSonnet: 0, claudeOpus: 0, llama: 0 },
+  { date: '06-16', gpt4o: 0, gpt35: 0, geminiPro: 0, geminiFlash: 0, claudeSonnet: 0, claudeOpus: 0, llama: 0 },
+  { date: '06-17', gpt4o: 0, gpt35: 0, geminiPro: 0, geminiFlash: 0, claudeSonnet: 0, claudeOpus: 0, llama: 0 },
+  { date: '06-18', gpt4o: 0, gpt35: 0, geminiPro: 0, geminiFlash: 0, claudeSonnet: 0, claudeOpus: 0, llama: 0 },
+  { date: '06-19', gpt4o: 0, gpt35: 0, geminiPro: 0, geminiFlash: 0, claudeSonnet: 0, claudeOpus: 0, llama: 0 },
   { date: '06-20', gpt4o: 0, gpt35: 0, geminiPro: 0, geminiFlash: 0, claudeSonnet: 0, claudeOpus: 0, llama: 0 },
 ];
 
-const INITIAL_LOGS = [
-  { id: 1, time: '09:15 AM', model: 'Claude 3.5 Sonnet', type: '코드 리뷰 및 분석', input: 8500, output: 2500, date: '06-20' },
-  { id: 2, time: '06-19 10:45 AM', model: 'GPT-4o', type: '데이터 정제 스크립트 실행', input: 12000, output: 4000, date: '06-19' },
-  { id: 3, time: '06-19 10:02 AM', model: 'Gemini 1.5 Pro', type: '다국어 문서 번역', input: 15000, output: 12000, date: '06-19' },
-  { id: 4, time: '06-19 09:30 AM', model: 'Gemini 1.5 Flash', type: '로그 이상 탐지 시계열 처리', input: 45000, output: 1500, date: '06-19' },
-];
+const INITIAL_LOGS = [];
 
 const COLOR_PRESETS = [
   { name: 'Emerald', color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)', border: 'rgba(16, 185, 129, 0.3)' },
@@ -208,13 +203,13 @@ export default function TokenManagerApp() {
 
   // --- 3. 통계 및 수치 산출 로직 ---
   const modelOffset = {
-    'GPT-4o': 200000,
-    'GPT-3.5 Turbo': 600000,
-    'Gemini 1.5 Pro': 150000,
-    'Gemini 1.5 Flash': 1800000,
-    'Claude 3.5 Sonnet': 150000,
-    'Claude 3 Opus': 80000,
-    'Llama 3.1 70B': 800000,
+    'GPT-4o': 0,
+    'GPT-3.5 Turbo': 0,
+    'Gemini 1.5 Pro': 0,
+    'Gemini 1.5 Flash': 0,
+    'Claude 3.5 Sonnet': 0,
+    'Claude 3 Opus': 0,
+    'Llama 3.1 70B': 0,
   };
 
   const usageByModel = useMemo(() => {
@@ -237,7 +232,7 @@ export default function TokenManagerApp() {
       if (!price) return acc;
       const c = ((log.input / 1000) * price.input) + ((log.output / 1000) * price.output);
       return acc + c;
-    }, 0) + 42.85;
+    }, 0);
 
     const totalTokens = Object.values(usageByModel).reduce((acc, val) => acc + val, 0);
     const activeSessions = new Set(logs.map(log => log.model)).size;
