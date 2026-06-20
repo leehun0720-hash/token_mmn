@@ -47,8 +47,12 @@ const INITIAL_PRICING = {
   'GPT-3.5 Turbo': { input: 0.0005, output: 0.0015, color: '#059669', bg: 'rgba(5, 150, 105, 0.1)', border: 'rgba(5, 150, 105, 0.3)', key: 'gpt35', isCustom: false },
   'Gemini 1.5 Pro': { input: 0.0035, output: 0.0105, color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.1)', border: 'rgba(59, 130, 246, 0.3)', key: 'geminiPro', isCustom: false },
   'Gemini 1.5 Flash': { input: 0.000075, output: 0.0003, color: '#60a5fa', bg: 'rgba(96, 165, 250, 0.1)', border: 'rgba(96, 165, 250, 0.3)', key: 'geminiFlash', isCustom: false },
+  'Gemini 3.5 Flash (Medium)': { input: 0.0001, output: 0.0004, color: '#38bdf8', bg: 'rgba(56, 189, 248, 0.1)', border: 'rgba(56, 189, 248, 0.3)', key: 'gemini35FlashMed', isCustom: false },
+  'Gemini 3.1 Pro (High)': { input: 0.0015, output: 0.0045, color: '#2563eb', bg: 'rgba(37, 99, 235, 0.1)', border: 'rgba(37, 99, 235, 0.3)', key: 'gemini31ProHigh', isCustom: false },
   'Claude 3.5 Sonnet': { input: 0.003, output: 0.015, color: '#ec4899', bg: 'rgba(236, 72, 153, 0.1)', border: 'rgba(236, 72, 153, 0.3)', key: 'claudeSonnet', isCustom: false },
   'Claude 3 Opus': { input: 0.015, output: 0.075, color: '#f97316', bg: 'rgba(249, 115, 22, 0.1)', border: 'rgba(249, 115, 22, 0.3)', key: 'claudeOpus', isCustom: false },
+  'Claude Sonnet 4.6 (Thinking)': { input: 0.0030, output: 0.0150, color: '#f472b6', bg: 'rgba(244, 114, 182, 0.1)', border: 'rgba(244, 114, 182, 0.3)', key: 'claudeSonnet46Think', isCustom: false },
+  'Claude Opus 4.6 (Thinking)': { input: 0.0150, output: 0.0750, color: '#fb923c', bg: 'rgba(251, 146, 60, 0.1)', border: 'rgba(251, 146, 60, 0.3)', key: 'claudeOpus46Think', isCustom: false },
   'Llama 3.1 70B': { input: 0.0007, output: 0.0009, color: '#a855f7', bg: 'rgba(168, 85, 247, 0.1)', border: 'rgba(168, 85, 247, 0.3)', key: 'llama', isCustom: false },
 };
 
@@ -58,8 +62,12 @@ const INITIAL_LIMITS = {
   'GPT-3.5 Turbo': 1000000,
   'Gemini 1.5 Pro': 400000,
   'Gemini 1.5 Flash': 3000000,
+  'Gemini 3.5 Flash (Medium)': 3000000,
+  'Gemini 3.1 Pro (High)': 1000000,
   'Claude 3.5 Sonnet': 400000,
   'Claude 3 Opus': 200000,
+  'Claude Sonnet 4.6 (Thinking)': 500000,
+  'Claude Opus 4.6 (Thinking)': 300000,
   'Llama 3.1 70B': 1500000,
 };
 
@@ -69,19 +77,23 @@ const BASE_MODEL_TEMPLATES = {
   'GPT-3.5 Turbo': { input: 0.0005, output: 0.0015, limit: 1000000, contextWindow: '16,385 (1.6만)', maxOutput: '4,096' },
   'Gemini 1.5 Pro': { input: 0.0035, output: 0.0105, limit: 400000, contextWindow: '2,000,000 (200만)', maxOutput: '8,192' },
   'Gemini 1.5 Flash': { input: 0.000075, output: 0.0003, limit: 3000000, contextWindow: '1,000,000 (100만)', maxOutput: '8,192' },
+  'Gemini 3.5 Flash (Medium)': { input: 0.0001, output: 0.0004, limit: 3000000, contextWindow: '1,000,000 (100만)', maxOutput: '8,192' },
+  'Gemini 3.1 Pro (High)': { input: 0.0015, output: 0.0045, limit: 1000000, contextWindow: '2,000,000 (200만)', maxOutput: '8,192' },
   'Claude 3.5 Sonnet': { input: 0.003, output: 0.015, limit: 400000, contextWindow: '200,000 (20만)', maxOutput: '8,192' },
   'Claude 3 Opus': { input: 0.015, output: 0.075, limit: 200000, contextWindow: '200,000 (20만)', maxOutput: '4,096' },
+  'Claude Sonnet 4.6 (Thinking)': { input: 0.0030, output: 0.0150, limit: 500000, contextWindow: '200,000 (20만)', maxOutput: '8,192' },
+  'Claude Opus 4.6 (Thinking)': { input: 0.0150, output: 0.0750, limit: 300000, contextWindow: '200,000 (20만)', maxOutput: '4,096' },
   'Llama 3.1 70B': { input: 0.0007, output: 0.0009, limit: 1500000, contextWindow: '128,000 (12.8만)', maxOutput: '4,096' },
 };
 
 // 3. 초기 모의 일자별 차트 데이터 (모두 0으로 리셋)
 const INITIAL_USAGE_DATA = [
-  { date: '06-15', gpt4o: 0, gpt35: 0, geminiPro: 0, geminiFlash: 0, claudeSonnet: 0, claudeOpus: 0, llama: 0 },
-  { date: '06-16', gpt4o: 0, gpt35: 0, geminiPro: 0, geminiFlash: 0, claudeSonnet: 0, claudeOpus: 0, llama: 0 },
-  { date: '06-17', gpt4o: 0, gpt35: 0, geminiPro: 0, geminiFlash: 0, claudeSonnet: 0, claudeOpus: 0, llama: 0 },
-  { date: '06-18', gpt4o: 0, gpt35: 0, geminiPro: 0, geminiFlash: 0, claudeSonnet: 0, claudeOpus: 0, llama: 0 },
-  { date: '06-19', gpt4o: 0, gpt35: 0, geminiPro: 0, geminiFlash: 0, claudeSonnet: 0, claudeOpus: 0, llama: 0 },
-  { date: '06-20', gpt4o: 0, gpt35: 0, geminiPro: 0, geminiFlash: 0, claudeSonnet: 0, claudeOpus: 0, llama: 0 },
+  { date: '06-15', gpt4o: 0, gpt35: 0, geminiPro: 0, geminiFlash: 0, gemini35FlashMed: 0, gemini31ProHigh: 0, claudeSonnet: 0, claudeOpus: 0, claudeSonnet46Think: 0, claudeOpus46Think: 0, llama: 0 },
+  { date: '06-16', gpt4o: 0, gpt35: 0, geminiPro: 0, geminiFlash: 0, gemini35FlashMed: 0, gemini31ProHigh: 0, claudeSonnet: 0, claudeOpus: 0, claudeSonnet46Think: 0, claudeOpus46Think: 0, llama: 0 },
+  { date: '06-17', gpt4o: 0, gpt35: 0, geminiPro: 0, geminiFlash: 0, gemini35FlashMed: 0, gemini31ProHigh: 0, claudeSonnet: 0, claudeOpus: 0, claudeSonnet46Think: 0, claudeOpus46Think: 0, llama: 0 },
+  { date: '06-18', gpt4o: 0, gpt35: 0, geminiPro: 0, geminiFlash: 0, gemini35FlashMed: 0, gemini31ProHigh: 0, claudeSonnet: 0, claudeOpus: 0, claudeSonnet46Think: 0, claudeOpus46Think: 0, llama: 0 },
+  { date: '06-19', gpt4o: 0, gpt35: 0, geminiPro: 0, geminiFlash: 0, gemini35FlashMed: 0, gemini31ProHigh: 0, claudeSonnet: 0, claudeOpus: 0, claudeSonnet46Think: 0, claudeOpus46Think: 0, llama: 0 },
+  { date: '06-20', gpt4o: 0, gpt35: 0, geminiPro: 0, geminiFlash: 0, gemini35FlashMed: 0, gemini31ProHigh: 0, claudeSonnet: 0, claudeOpus: 0, claudeSonnet46Think: 0, claudeOpus46Think: 0, llama: 0 },
 ];
 
 const INITIAL_LOGS = [];
@@ -208,8 +220,12 @@ export default function TokenManagerApp() {
     'GPT-3.5 Turbo': 0,
     'Gemini 1.5 Pro': 0,
     'Gemini 1.5 Flash': 0,
+    'Gemini 3.5 Flash (Medium)': 0,
+    'Gemini 3.1 Pro (High)': 0,
     'Claude 3.5 Sonnet': 0,
     'Claude 3 Opus': 0,
+    'Claude Sonnet 4.6 (Thinking)': 0,
+    'Claude Opus 4.6 (Thinking)': 0,
     'Llama 3.1 70B': 0,
   };
 
@@ -253,49 +269,73 @@ export default function TokenManagerApp() {
       return;
     }
 
+    // 사용자가 제공한 괄호 옵션 인식용 정규표현식
+    const tokenRegex = /(Gemini 3\.[15] [a-zA-Z]+ \([a-zA-Z]+\)|Claude (?:Sonnet|Opus) 4\.[68] \([a-zA-Z]+\)).*?Prompt:\s*(\d+).*?Completion:\s*(\d+)/i;
+    const directMatch = pasteLogs.match(tokenRegex);
+
     let detectedModel = 'GPT-4o';
-    const textLower = pasteLogs.toLowerCase();
-    if (textLower.includes('gemini 1.5 pro') || textLower.includes('gemini-1.5-pro')) {
-      detectedModel = 'Gemini 1.5 Pro';
-    } else if (textLower.includes('gemini 1.5 flash') || textLower.includes('gemini-1.5-flash')) {
-      detectedModel = 'Gemini 1.5 Flash';
-    } else if (textLower.includes('claude 3.5 sonnet') || textLower.includes('sonnet')) {
-      detectedModel = 'Claude 3.5 Sonnet';
-    } else if (textLower.includes('opus')) {
-      detectedModel = 'Claude 3 Opus';
-    } else if (textLower.includes('gpt-3.5') || textLower.includes('gpt35')) {
-      detectedModel = 'GPT-3.5 Turbo';
-    } else if (textLower.includes('llama')) {
-      detectedModel = 'Llama 3.1 70B';
-    } else if (textLower.includes('gpt-4o') || textLower.includes('gpt4o')) {
-      detectedModel = 'GPT-4o';
-    }
-
-    const inputRegexes = [
-      /(?:input|prompt|입력|요청)(?:\s*tokens?)?[:\s\-=]+([0-9,]+)/i,
-      /([0-9,]+)\s*(?:input|prompt|입력)\s*tokens?/i
-    ];
-    const outputRegexes = [
-      /(?:output|completion|출력|응답)(?:\s*tokens?)?[:\s\-=]+([0-9,]+)/i,
-      /([0-9,]+)\s*(?:output|completion|출력|응답)\s*tokens?/i
-    ];
-
     let inputTokens = 0;
     let outputTokens = 0;
 
-    for (let r of inputRegexes) {
-      const match = pasteLogs.match(r);
-      if (match) {
-        inputTokens = parseInt(match[1].replace(/,/g, ''));
-        break;
+    if (directMatch) {
+      const parsedModelName = directMatch[1];
+      // 대소문자 공백 제거 후 실제 등록되어 있는 가격표의 모델명 매칭
+      const matchedKey = Object.keys(pricing).find(
+        m => m.toLowerCase().replace(/\s+/g, '') === parsedModelName.toLowerCase().replace(/\s+/g, '')
+      );
+      detectedModel = matchedKey || parsedModelName;
+      inputTokens = parseInt(directMatch[2]);
+      outputTokens = parseInt(directMatch[3]);
+    } else {
+      // Fallback: 기존 정규식 파서 로직 실행
+      const textLower = pasteLogs.toLowerCase();
+      if (textLower.includes('gemini 3.5 flash') || (textLower.includes('gemini 3.5') && textLower.includes('medium'))) {
+        detectedModel = 'Gemini 3.5 Flash (Medium)';
+      } else if (textLower.includes('gemini 3.1 pro') || (textLower.includes('gemini 3.1') && textLower.includes('high'))) {
+        detectedModel = 'Gemini 3.1 Pro (High)';
+      } else if (textLower.includes('claude sonnet 4.6') || (textLower.includes('sonnet 4.6') && textLower.includes('thinking'))) {
+        detectedModel = 'Claude Sonnet 4.6 (Thinking)';
+      } else if (textLower.includes('claude opus 4.6') || (textLower.includes('opus 4.6') && textLower.includes('thinking'))) {
+        detectedModel = 'Claude Opus 4.6 (Thinking)';
+      } else if (textLower.includes('gemini 1.5 pro') || textLower.includes('gemini-1.5-pro')) {
+        detectedModel = 'Gemini 1.5 Pro';
+      } else if (textLower.includes('gemini 1.5 flash') || textLower.includes('gemini-1.5-flash')) {
+        detectedModel = 'Gemini 1.5 Flash';
+      } else if (textLower.includes('claude 3.5 sonnet') || textLower.includes('sonnet')) {
+        detectedModel = 'Claude 3.5 Sonnet';
+      } else if (textLower.includes('opus')) {
+        detectedModel = 'Claude 3 Opus';
+      } else if (textLower.includes('gpt-3.5') || textLower.includes('gpt35')) {
+        detectedModel = 'GPT-3.5 Turbo';
+      } else if (textLower.includes('llama')) {
+        detectedModel = 'Llama 3.1 70B';
+      } else if (textLower.includes('gpt-4o') || textLower.includes('gpt4o')) {
+        detectedModel = 'GPT-4o';
       }
-    }
 
-    for (let r of outputRegexes) {
-      const match = pasteLogs.match(r);
-      if (match) {
-        outputTokens = parseInt(match[1].replace(/,/g, ''));
-        break;
+      const inputRegexes = [
+        /(?:input|prompt|입력|요청)(?:\s*tokens?)?[:\s\-=]+([0-9,]+)/i,
+        /([0-9,]+)\s*(?:input|prompt|입력)\s*tokens?/i
+      ];
+      const outputRegexes = [
+        /(?:output|completion|출력|응답)(?:\s*tokens?)?[:\s\-=]+([0-9,]+)/i,
+        /([0-9,]+)\s*(?:output|completion|출력|응답)\s*tokens?/i
+      ];
+
+      for (let r of inputRegexes) {
+        const match = pasteLogs.match(r);
+        if (match) {
+          inputTokens = parseInt(match[1].replace(/,/g, ''));
+          break;
+        }
+      }
+
+      for (let r of outputRegexes) {
+        const match = pasteLogs.match(r);
+        if (match) {
+          outputTokens = parseInt(match[1].replace(/,/g, ''));
+          break;
+        }
       }
     }
 
